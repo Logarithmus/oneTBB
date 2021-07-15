@@ -115,7 +115,7 @@ function(tbb_add_lib_test)
     set(multiValueArgs DEPENDENCIES)
     cmake_parse_arguments(_tbb_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    add_library(_${_tbb_test_NAME} SHARED ${_tbb_test_SUBDIR}/${_tbb_test_NAME}.cpp)
+    add_library(_${_tbb_test_NAME} ${_tbb_test_SUBDIR}/${_tbb_test_NAME}.cpp)
 
     target_include_directories(_${_tbb_test_NAME}
         PUBLIC
@@ -595,13 +595,15 @@ if (NOT "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "mips")
         endif()
     endif()
 
-    tbb_add_lib_test(SUBDIR tbbmalloc NAME test_malloc_atexit DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc)
-    tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_atexit DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc _test_malloc_atexit)
+    if (BUILD_SHARED_LIBS)
+        tbb_add_lib_test(SUBDIR tbbmalloc NAME test_malloc_atexit DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc)
+        tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_atexit DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc _test_malloc_atexit)
 
-    # Define TBB malloc proxy tests
-    tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_overload DEPENDENCIES TBB::tbbmalloc_proxy)
-    tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_overload_disable DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc) # safer_msize call need to be available
-    tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_new_handler DEPENDENCIES TBB::tbbmalloc_proxy)
+        # Define TBB malloc proxy tests
+        tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_overload DEPENDENCIES TBB::tbbmalloc_proxy)
+        tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_overload_disable DEPENDENCIES TBB::tbbmalloc_proxy TBB::tbbmalloc) # safer_msize call need to be available
+        tbb_add_test(SUBDIR tbbmalloc NAME test_malloc_new_handler DEPENDENCIES TBB::tbbmalloc_proxy)
+    endif()
 endif()
 
 unset(HWLOC_2_5_TESTS_STATUS_SHOWN)
